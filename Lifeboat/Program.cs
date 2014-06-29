@@ -16,17 +16,23 @@ namespace LifeBoat
         public string kickAnimationName = "Kickstand";
 
         [KSPField] 
-        public float foodAmount = 5;
+        public float foodAmount = 3f;
 
         [KSPField] 
-        public float oxyAmount = 15;
+        public float oxyAmount = 15f;
 
         [KSPField]
-        public float waterAmount = 15;
+        public float waterAmount = 15f;
+
+        [KSPField]
+        public float monoAmount = 7.5f;
 
         [KSPField(isPersistant = true)]
         public bool isDeployed = false;
 
+        [KSPField(isPersistant = true)]
+        public bool isUnsealed = false;
+        
         [KSPAction("Disconnect")]
         public void DisconnectPod(KSPActionParam param)
         {
@@ -136,13 +142,27 @@ namespace LifeBoat
                     part.CrewCapacity = 1;
                     ToggleEvent("InflateLifeboat", false);
                     ToggleEvent("DeployKickstand", true);
-                    AddResources();
+                    if (!isUnsealed)
+                    {
+                        AddResources();
+                        isUnsealed = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                print("ERR in InflateLifeboat: " + ex.Message);
+                print("ERR in InflateLifeboat: " + ex.StackTrace);
             }
+        }
+
+        public void DeflateLifeboat(int speed)
+        {
+            DeployAnimation[deployAnimationName].time = DeployAnimation[deployAnimationName].length;
+            DeployAnimation[deployAnimationName].speed = speed;
+            DeployAnimation.Play(deployAnimationName);
+            HatchAnimation[hatchAnimationName].speed = speed;
+            HatchAnimation.Play(hatchAnimationName);
+            part.CrewCapacity =0;
         }
 
         [KSPEvent(guiName = "Disconnect", guiActive = true, externalToEVAOnly = true, guiActiveEditor = false, active = true, guiActiveUnfocused = true, unfocusedRange = 3.0f)]
@@ -175,8 +195,19 @@ namespace LifeBoat
         {
             DeployAnimation[deployAnimationName].layer = 2;
             HatchAnimation[hatchAnimationName].layer = 3;
-            KickAnimation[kickAnimationName].layer = 2; 
+            KickAnimation[kickAnimationName].layer = 2;
+            if (!isDeployed) DeflateLifeboat(-10); 
             base.OnStart(state);
+        }
+
+        public override void OnAwake()
+        {
+            if (!isDeployed) DeflateLifeboat(-10);
+        }
+
+        public override void OnLoad(ConfigNode node)
+        {
+            if (!isDeployed) DeflateLifeboat(-10);
         }
 
         private void AddResources()
@@ -184,14 +215,24 @@ namespace LifeBoat
             var f = part.Resources["Food"];
             var w = part.Resources["Water"];
             var o = part.Resources["Oxygen"];
+            var m = part.Resources["MonoPropellant"];
 
+            var massToLose = 0f;
+
+            m.amount = monoAmount;
+            m.maxAmount = monoAmount;
             f.maxAmount = foodAmount;
             f.amount = foodAmount;
             w.maxAmount = waterAmount;
             w.amount = waterAmount;
             o.maxAmount = oxyAmount;
             o.amount = oxyAmount;
-
+            massToLose += m.info.density * monoAmount;
+            massToLose += f.info.density * foodAmount;
+            massToLose += o.info.density * oxyAmount;
+            massToLose += w.info.density * waterAmount;
+            part.mass -= massToLose;
+            if (part.mass < 0.05f) part.mass = 0.05f;
         }
     }
 }
