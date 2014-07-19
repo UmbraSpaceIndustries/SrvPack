@@ -134,19 +134,7 @@ namespace LifeBoat
             {
                 if (!isDeployed)
                 {
-                    isDeployed = true;
-                    DeployAnimation[deployAnimationName].speed = 1;
-                    DeployAnimation.Play(deployAnimationName);
-                    HatchAnimation[hatchAnimationName].speed = 1;
-                    HatchAnimation.Play(hatchAnimationName);
-                    part.CrewCapacity = 1;
-                    ToggleEvent("InflateLifeboat", false);
-                    ToggleEvent("DeployKickstand", true);
-                    if (!isUnsealed)
-                    {
-                        AddResources();
-                        isUnsealed = true;
-                    }
+                    PlayDeployAnimation();
                 }
             }
             catch (Exception ex)
@@ -155,8 +143,27 @@ namespace LifeBoat
             }
         }
 
+        private void PlayDeployAnimation(int speed = 1)
+        {
+            print("Inflating");
+            DeployAnimation[deployAnimationName].speed = speed;
+            DeployAnimation.Play(deployAnimationName);
+            HatchAnimation[hatchAnimationName].speed = speed;
+            HatchAnimation.Play(hatchAnimationName);
+            isDeployed = true;
+            part.CrewCapacity = 1;
+            ToggleEvent("InflateLifeboat", false);
+            ToggleEvent("DeployKickstand", true);
+            if (!isUnsealed)
+            {
+                AddResources();
+                isUnsealed = true;
+            }
+        }
+
         public void DeflateLifeboat(int speed)
         {
+            print("Deflating");
             DeployAnimation[deployAnimationName].time = DeployAnimation[deployAnimationName].length;
             DeployAnimation[deployAnimationName].speed = speed;
             DeployAnimation.Play(deployAnimationName);
@@ -196,18 +203,41 @@ namespace LifeBoat
             DeployAnimation[deployAnimationName].layer = 2;
             HatchAnimation[hatchAnimationName].layer = 3;
             KickAnimation[kickAnimationName].layer = 2;
-            if (!isDeployed) DeflateLifeboat(-10); 
+            if (!isDeployed) DeflateLifeboat(-10);
+            else PlayDeployAnimation(10);
             base.OnStart(state);
+        }
+
+
+        public override void OnUpdate()
+        {
+            //var anim = part.FindModelAnimators(deployAnimationName).FirstOrDefault();
+            //if (anim[deployAnimationName].normalizedTime == 0f)
+            //{
+            //    if (!isDeployed)
+            //    {
+            //        DeflateLifeboat(-10);
+            //    }
+            //}
+            //else
+            //{
+            //    if (isDeployed)
+            //    {
+            //        PlayDeployAnimation(10);
+            //    } 
+            //}
         }
 
         public override void OnAwake()
         {
             if (!isDeployed) DeflateLifeboat(-10);
+            else PlayDeployAnimation(10);
         }
 
         public override void OnLoad(ConfigNode node)
         {
             if (!isDeployed) DeflateLifeboat(-10);
+            else PlayDeployAnimation(10);
         }
 
         private void AddResources()
@@ -219,20 +249,33 @@ namespace LifeBoat
 
             var massToLose = 0f;
 
-            m.amount = monoAmount;
-            m.maxAmount = monoAmount;
-            f.maxAmount = foodAmount;
-            f.amount = foodAmount;
-            w.maxAmount = waterAmount;
-            w.amount = waterAmount;
-            o.maxAmount = oxyAmount;
-            o.amount = oxyAmount;
-            massToLose += m.info.density * monoAmount;
-            massToLose += f.info.density * foodAmount;
-            massToLose += o.info.density * oxyAmount;
-            massToLose += w.info.density * waterAmount;
+            if (m != null)
+            {
+                m.amount = monoAmount;
+                m.maxAmount = monoAmount;
+                massToLose += m.info.density * monoAmount;
+            }
+            if (f != null)
+            {
+                f.maxAmount = foodAmount;
+                f.amount = foodAmount;
+                massToLose += f.info.density * foodAmount;
+            }
+            if (w != null)
+            {
+                w.maxAmount = waterAmount;
+                w.amount = waterAmount;
+                massToLose += w.info.density * waterAmount;
+            }
+            if (o != null)
+            {
+                o.maxAmount = oxyAmount;
+                o.amount = oxyAmount;
+                massToLose += o.info.density * oxyAmount;
+            }
             part.mass -= massToLose;
             if (part.mass < 0.05f) part.mass = 0.05f;
+
         }
     }
 }
