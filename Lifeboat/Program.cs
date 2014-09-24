@@ -16,13 +16,13 @@ namespace LifeBoat
         public string kickAnimationName = "Kickstand";
 
         [KSPField] 
-        public float foodAmount = 3f;
+        public float foodAmount = 1f;
 
         [KSPField] 
-        public float oxyAmount = 15f;
+        public float oxyAmount = 776.4f;
 
         [KSPField]
-        public float waterAmount = 15f;
+        public float waterAmount = 5f;
 
         [KSPField]
         public float monoAmount = 7.5f;
@@ -95,13 +95,21 @@ namespace LifeBoat
                                 print("Evacuating " + k.name);
                                 source.RemoveCrewmember(k);
                                 k.seat = null;
-                                k.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
+                                k.rosterStatus = ProtoCrewMember.RosterStatus.Available;
 
                                 //Add Crewmember
                                 part.AddCrewmember(k);
-                                k.rosterStatus = ProtoCrewMember.RosterStatus.ASSIGNED;
+                                k.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
                                 if (k.seat != null)
                                     k.seat.SpawnCrew();
+
+                                //Decouple!
+                                var p = part.parent;
+                                if (p.Modules.OfType<ModuleDecouple>().Any())
+                                {
+                                    var dpart = p.Modules.OfType<ModuleDecouple>().First();
+                                    dpart.Decouple();
+                                }
                             }
                             else
                             {
@@ -208,37 +216,6 @@ namespace LifeBoat
             base.OnStart(state);
         }
 
-
-        public override void OnUpdate()
-        {
-            //var anim = part.FindModelAnimators(deployAnimationName).FirstOrDefault();
-            //if (anim[deployAnimationName].normalizedTime == 0f)
-            //{
-            //    if (!isDeployed)
-            //    {
-            //        DeflateLifeboat(-10);
-            //    }
-            //}
-            //else
-            //{
-            //    if (isDeployed)
-            //    {
-            //        PlayDeployAnimation(10);
-            //    } 
-            //}
-        }
-
-        public override void OnAwake()
-        {
-            if (!isDeployed) DeflateLifeboat(-10);
-            else PlayDeployAnimation(10);
-        }
-
-        public override void OnLoad(ConfigNode node)
-        {
-            if (!isDeployed) DeflateLifeboat(-10);
-            else PlayDeployAnimation(10);
-        }
 
         private void AddResources()
         {
