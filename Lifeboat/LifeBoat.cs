@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace LifeBoat
 {
+    public class ModuleStoredResource : PartModule
+    {
+        [KSPField] public string ResourceName;
+        [KSPField] public float Amount;       
+    }
+
     public class LifeBoat : PartModule
     {
         [KSPField]
@@ -14,19 +20,6 @@ namespace LifeBoat
         public string hatchAnimationName = "moveHatch";
         [KSPField]
         public string kickAnimationName = "Kickstand";
-
-        [KSPField] 
-        public float foodAmount = 1f;
-
-        [KSPField] 
-        public float oxyAmount = 776.4f;
-
-        [KSPField]
-        public float waterAmount = 5f;
-
-        [KSPField]
-        public float monoAmount = 7.5f;
-
         [KSPField(isPersistant = true)]
         public bool isDeployed = false;
 
@@ -219,40 +212,20 @@ namespace LifeBoat
 
         private void AddResources()
         {
-            var f = part.Resources["Food"];
-            var w = part.Resources["Water"];
-            var o = part.Resources["Oxygen"];
-            var m = part.Resources["MonoPropellant"];
-
-            var massToLose = 0f;
-
-            if (m != null)
+            var massToLose = 0f; 
+            
+            foreach (var p in part.FindModulesImplementing<ModuleStoredResource>())
             {
-                m.amount = monoAmount;
-                m.maxAmount = monoAmount;
-                massToLose += m.info.density * monoAmount;
-            }
-            if (f != null)
-            {
-                f.maxAmount = foodAmount;
-                f.amount = foodAmount;
-                massToLose += f.info.density * foodAmount;
-            }
-            if (w != null)
-            {
-                w.maxAmount = waterAmount;
-                w.amount = waterAmount;
-                massToLose += w.info.density * waterAmount;
-            }
-            if (o != null)
-            {
-                o.maxAmount = oxyAmount;
-                o.amount = oxyAmount;
-                massToLose += o.info.density * oxyAmount;
+                var resInfo = PartResourceLibrary.Instance.GetDefinition(p.ResourceName);
+                var resNode = new ConfigNode("RESOURCE");
+                resNode.AddValue("name", p.ResourceName);
+                resNode.AddValue("amount", p.Amount);
+                resNode.AddValue("maxAmount", p.Amount);
+                part.Resources.Add(resNode);
+                massToLose += resInfo.density * p.Amount;
             }
             part.mass -= massToLose;
             if (part.mass < 0.05f) part.mass = 0.05f;
-
         }
     }
 }
