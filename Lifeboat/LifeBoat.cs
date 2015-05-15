@@ -15,6 +15,11 @@ namespace LifeBoat
     public class LifeBoat : PartModule
     {
         [KSPField]
+        public float dampenFactor = .75f;
+        [KSPField]
+        public float dampenSpeed = 15f;
+        
+        [KSPField]
         public string deployAnimationName = "DeployPod";
         [KSPField]
         public string hatchAnimationName = "moveHatch";
@@ -201,6 +206,7 @@ namespace LifeBoat
 
         public override void OnStart(StartState state)
         {
+            part.force_activate();
             DeployAnimation[deployAnimationName].layer = 2;
             HatchAnimation[hatchAnimationName].layer = 3;
             KickAnimation[kickAnimationName].layer = 2;
@@ -227,5 +233,40 @@ namespace LifeBoat
             part.mass -= massToLose;
             if (part.mass < 0.05f) part.mass = 0.05f;
         }
+    
+
+        public void OnFixedUpdate()
+        {
+            try
+            {
+                if (part.checkLanded())
+                {
+                    Dampen();
+                }
+                if (part.Landed)
+                {
+                    Dampen();
+                }
+            }
+            catch (Exception ex)
+            {
+                print("[AB] Error in OnFixedUpdate - " + ex.Message);
+            }
+        }
+
+        private void Dampen()
+        {
+            if (vessel.srfSpeed > dampenSpeed
+                || vessel.horizontalSrfSpeed > dampenSpeed)
+            {
+                //print("Dampening...");
+                foreach (var p in vessel.parts)
+                {
+                    p.Rigidbody.angularVelocity *= dampenFactor;
+                    p.Rigidbody.velocity *= dampenFactor;
+                }
+            }
+        }
     }
 }
+
