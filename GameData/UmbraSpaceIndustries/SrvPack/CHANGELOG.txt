@@ -1,0 +1,5 @@
+0.3.1	2016.10.16
+------------------
+KSP 1.0.4 Compatibility release
+Refreshed dependencies
+Updated CTT placement
