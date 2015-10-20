@@ -20,22 +20,13 @@ namespace LifeBoat
         public float dampenSpeed = 15f;
         
         [KSPField]
-        public string deployAnimationName = "DeployPod";
-        [KSPField]
-        public string hatchAnimationName = "moveHatch";
-        [KSPField]
-        public string kickAnimationName = "Kickstand";
+        public string deployAnimationName = "InflatePod";
+       
         [KSPField(isPersistant = true)]
         public bool isDeployed = false;
 
         [KSPField(isPersistant = true)]
         public bool isUnsealed = false;
-        
-        [KSPAction("Disconnect")]
-        public void DisconnectPod(KSPActionParam param)
-        {
-            DisconnectLifeboat();
-        }
         
         public Animation DeployAnimation
         {
@@ -44,22 +35,6 @@ namespace LifeBoat
                 return part.FindModelAnimators(deployAnimationName)[0];
             }
         }
-        public Animation KickAnimation
-        {
-            get
-            {
-                return part.FindModelAnimators(kickAnimationName)[0];
-            }
-        }
-
-        public Animation HatchAnimation
-        {
-            get
-            {
-                return part.FindModelAnimators(hatchAnimationName)[0];
-            }
-        }
-
 
         [KSPAction("Evacuate")]
         public void EvacuateShip(KSPActionParam param)
@@ -154,12 +129,9 @@ namespace LifeBoat
             print("Inflating");
             DeployAnimation[deployAnimationName].speed = speed;
             DeployAnimation.Play(deployAnimationName);
-            HatchAnimation[hatchAnimationName].speed = speed;
-            HatchAnimation.Play(hatchAnimationName);
             isDeployed = true;
             part.CrewCapacity = 1;
             ToggleEvent("InflateLifeboat", false);
-            ToggleEvent("DeployKickstand", true);
             if (!isUnsealed)
             {
                 AddResources();
@@ -173,28 +145,7 @@ namespace LifeBoat
             DeployAnimation[deployAnimationName].time = DeployAnimation[deployAnimationName].length;
             DeployAnimation[deployAnimationName].speed = speed;
             DeployAnimation.Play(deployAnimationName);
-            HatchAnimation[hatchAnimationName].speed = speed;
-            HatchAnimation.Play(hatchAnimationName);
             part.CrewCapacity =0;
-        }
-
-        [KSPEvent(guiName = "Disconnect", guiActive = true, externalToEVAOnly = true, guiActiveEditor = false, active = true, guiActiveUnfocused = true, unfocusedRange = 3.0f)]
-        public void DisconnectLifeboat()
-        {
-            part.decouple(100f);
-            ToggleEvent("DisconnectLifeboat", false);
-        }
-
-
-        [KSPEvent(guiName = "Kickstand", guiActive = true, externalToEVAOnly = true, guiActiveEditor = false, active = false, guiActiveUnfocused = true, unfocusedRange = 3.0f)]
-        public void DeployKickstand()
-        {
-            if (isDeployed)
-            {
-                KickAnimation[kickAnimationName].speed = 1;
-                KickAnimation.Play(kickAnimationName);
-                ToggleEvent("DeployKickstand", false);
-            }
         }
 
         private void ToggleEvent(string eventName, bool state)
@@ -206,10 +157,7 @@ namespace LifeBoat
 
         public override void OnStart(StartState state)
         {
-            part.force_activate();
             DeployAnimation[deployAnimationName].layer = 2;
-            HatchAnimation[hatchAnimationName].layer = 3;
-            KickAnimation[kickAnimationName].layer = 2;
             if (!isDeployed) DeflateLifeboat(-10);
             else PlayDeployAnimation(10);
             base.OnStart(state);
@@ -235,7 +183,7 @@ namespace LifeBoat
         }
     
 
-        public void OnFixedUpdate()
+        public void FixedUpdate()
         {
             try
             {

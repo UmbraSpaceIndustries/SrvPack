@@ -1,0 +1,7 @@
+0.3.2	2016.10.20
+------------------
+KSP 1.0.4 Compatibility release
+Refreshed dependencies
+Created a new version of the DERP - note that the old DERP has been deprecated
+Updated CTT placement
+
