@@ -29,6 +29,9 @@ namespace FloaterTools
         [KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Pump speed"), UI_FloatRange(minValue = 10f, maxValue = 100f, stepIncrement = 10f)]
         public float pumpPower = 100f;
 
+        [KSPField(guiActive = true, guiActiveEditor = true, guiName = "Current buoyancy")]
+        public float totalCurrentBuoyancy = 0f;
+
         [KSPField(isPersistant = true)]
         public float buoyancyWhenStowed = 0f;
 
@@ -70,11 +73,11 @@ namespace FloaterTools
         #region Firespitter helper methods
         private void SyncFireSpitterBuoyancy()
         {
-            var curBuoyancy = currentInflationPercentage * maxBuoyancy;
+            totalCurrentBuoyancy = currentInflationPercentage * maxBuoyancy;
 
             //Don't wanna needlessly change physics
-            if (FireSpitterBuoyancy != curBuoyancy)     
-                FireSpitterBuoyancy = curBuoyancy; 
+            if (FireSpitterBuoyancy != totalCurrentBuoyancy)     
+                FireSpitterBuoyancy = totalCurrentBuoyancy; 
         }
 
         private float FireSpitterBuoyancy {
