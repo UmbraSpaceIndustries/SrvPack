@@ -204,6 +204,8 @@ namespace LifeBoat
 
         private void Dampen()
         {
+			if (!isDeployed)
+                return;
             if (vessel.srfSpeed > dampenSpeed
                 || vessel.horizontalSrfSpeed > dampenSpeed)
             {
