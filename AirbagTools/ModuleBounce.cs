@@ -31,8 +31,8 @@ public class ModuleBounceCollider : MonoBehaviour
     Vector3 lastVel = Vector3.zero;
     void FixedUpdate()
     {
-        if (rigidbody)
-            lastVel = rigidbody.velocity;
+        if (GetComponent<Rigidbody>())
+            lastVel = GetComponent<Rigidbody>().velocity;
     }
 
     private void OnCollisionEnter(Collision col)
@@ -45,7 +45,7 @@ public class ModuleBounceCollider : MonoBehaviour
             normal.Normalize();
             Vector3 inVelocity = lastVel;
             Vector3 outVelocity = bounciness * (-2f * (Vector3.Dot(inVelocity, normal) * normal) + inVelocity);
-            rigidbody.velocity = outVelocity;
+            GetComponent<Rigidbody>().velocity = outVelocity;
         }
         catch (Exception ex)
         {

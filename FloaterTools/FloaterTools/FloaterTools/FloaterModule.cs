@@ -44,7 +44,10 @@ namespace FloaterTools
         [KSPField]
         public string FireSpitterBuoyancyModuleName = "FSbuoyancy";
 
-        private float targetInflationPercentage => isDeployed ? buoyancyPercentageWhenDeployed / 100f : 0f;
+        private float targetInflationPercentage
+        {
+            get { return isDeployed ? buoyancyPercentageWhenDeployed/100f : 0f; }
+        }
 
         #endregion
 
@@ -116,13 +119,19 @@ namespace FloaterTools
             UpdateEvents();
         }
 
-        private float currentInflationPercentage =>
-                Mathf.Clamp01(DeployAnimation[deployAnimationName].normalizedTime);
+        private float currentInflationPercentage
+        {
+            get { return Mathf.Clamp01(DeployAnimation[deployAnimationName].normalizedTime); }
+        }
         
 
 
         #region Animation support methods
-        private Animation DeployAnimation => part.FindModelAnimators(deployAnimationName)[0];
+
+        private Animation DeployAnimation
+        {
+            get { return part.FindModelAnimators(deployAnimationName)[0]; }
+        }
 
         private void SetPumpSpeed()
         {
