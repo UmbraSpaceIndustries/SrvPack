@@ -185,6 +185,9 @@ namespace LifeBoat
 
         public void FixedUpdate()
         {
+            if (!HighLogic.LoadedSceneIsFlight)
+                return;
+
             try
             {
                 if (part.checkLanded())
