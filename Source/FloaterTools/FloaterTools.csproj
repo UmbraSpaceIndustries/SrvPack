@@ -53,7 +53,7 @@
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>..\..\..\..\KSP_DEV\KSP_x64_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
-    </Reference
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\KSP_DEV\KSP_x64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
