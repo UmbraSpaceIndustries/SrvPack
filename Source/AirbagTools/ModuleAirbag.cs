@@ -80,7 +80,7 @@ namespace AirbagTools
         }
 
 
-        public void OnFixedUpdate()
+        public override void OnFixedUpdate()
         {
             try
             {
