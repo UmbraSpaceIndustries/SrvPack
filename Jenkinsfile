@@ -84,12 +84,12 @@ pipeline {
           $JobReleasePath = Join-Path -Path $ReleasePath -ChildPath $env:JOB_CACHE
           $ReferencePath = Join-Path -Path $JobReleasePath -ChildPath "000_USITools"
 
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/MKS --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/KolonyTools/KolonyTools.csproj
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/WOLF --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/WOLF/WOLFUI/WOLFUI.csproj
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/WOLF --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/WOLF/WOLF/WOLF.csproj
+          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
+            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/AirbagTools/AirbagTools.csproj
+          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
+            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/FloaterTools/FloaterTools.csproj
+          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
+            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/Lifeboat/Lifeboat.csproj
         '''
       }
     }
@@ -151,15 +151,13 @@ pipeline {
           Copy-Item -Path (Join-Path -Path $CachePath -ChildPath "CommunityCategoryKit") -Destination ./artifacts/GameData -Recurse
           Copy-Item -Path (Join-Path -Path $CachePath -ChildPath "CommunityResourcePack") -Destination ./artifacts/GameData -Recurse
           Copy-Item -Path (Join-Path -Path $CachePath -ChildPath "Firespitter") -Destination ./artifacts/GameData -Recurse
-          Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "Akita") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
           Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "FX") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
           Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "Kontainers") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
-          Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "Konstruction") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
           Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "ReactorPack") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
           Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "USICore") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
         '''
         script {
-          env.ARCHIVE_FILENAME = "MKS_${env.GITVERSION_SEMVER}.zip"
+          env.ARCHIVE_FILENAME = "SrvPack_${env.GITVERSION_SEMVER}.zip"
           zip dir: "artifacts", zipFile: "${env.ARCHIVE_FILENAME}", archive: true
         }
       }
