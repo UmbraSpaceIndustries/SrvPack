@@ -75,24 +75,6 @@ pipeline {
         }
       }
     }
-    // Build
-    stage("Build") {
-      steps {
-        powershell '''
-          $DriveRoot = Split-Path -Path $env:WORKSPACE -Qualifier
-          $ReleasePath = Join-Path -Path $DriveRoot -ChildPath "usi-releases"
-          $JobReleasePath = Join-Path -Path $ReleasePath -ChildPath $env:JOB_CACHE
-          $ReferencePath = Join-Path -Path $JobReleasePath -ChildPath "000_USITools"
-
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/AirbagTools/AirbagTools.csproj
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/FloaterTools/FloaterTools.csproj
-          dotnet build --output FOR_RELEASE/GameData/UmbraSpaceIndustries/SrvPack --configuration $env:BUILD_CONFIG `
-            --verbosity detailed /p:ReferencePath="$ReferencePath" ./Source/Lifeboat/Lifeboat.csproj
-        '''
-      }
-    }
     // Update artifact cache
     stage("Cache artifacts") {
       steps {
@@ -152,9 +134,6 @@ pipeline {
           Copy-Item -Path (Join-Path -Path $CachePath -ChildPath "CommunityResourcePack") -Destination ./artifacts/GameData -Recurse
           Copy-Item -Path (Join-Path -Path $CachePath -ChildPath "Firespitter") -Destination ./artifacts/GameData -Recurse
           Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "FX") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
-          Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "Kontainers") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
-          Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "ReactorPack") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
-          Copy-Item -Path (Join-Path -Path $UsiCachePath -ChildPath "USICore") -Destination ./artifacts/GameData/UmbraSpaceIndustries -Recurse
         '''
         script {
           env.ARCHIVE_FILENAME = "SrvPack_${env.GITVERSION_SEMVER}.zip"
